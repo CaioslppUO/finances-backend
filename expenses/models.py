@@ -10,7 +10,7 @@ class ExpenseMonth(models.Model):
     """
 
     expense_record_id = models.AutoField(primary_key=True)
-    fk_user = models.ForeignKey(
+    fk_user_id = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="expense_months"
     )
     date = models.DateField()
