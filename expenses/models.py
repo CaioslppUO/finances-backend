@@ -1,6 +1,7 @@
 # Django
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 
 
 # Models
@@ -24,6 +25,11 @@ class ExpenseMonth(models.Model):
 
     def __str__(self):
         return f"{self.fk_user_id.username} - {self.date.strftime('%m-%Y')}"
+
+    def save(self, *args, **kwargs):
+        # always set day to 1
+        self.date = self.date.replace(day=1)
+        super().save(*args, **kwargs)
 
 
 class ExpenseType(models.Model):
@@ -93,3 +99,40 @@ class ExpensePayment(models.Model):
 
     def __str__(self):
         return f"{self.fk_user_id.username} - {self.payment} - Active: {self.is_active}"
+
+
+class Expense(models.Model):
+    """
+    A user personal expense.
+    """
+
+    expense_id = models.AutoField(primary_key=True)
+    fk_expense_month_id = models.ForeignKey(
+        ExpenseMonth, on_delete=models.PROTECT, related_name="expenses"
+    )
+    description = models.CharField(max_length=50)
+    value = models.DecimalField(max_digits=10, decimal_places=2)
+    fk_type_id = models.ForeignKey(
+        ExpenseType,
+        on_delete=models.SET_NULL,
+        related_name="expenses",
+        null=True,
+        blank=True,
+    )
+    fk_budget_id = models.ForeignKey(
+        ExpenseBudget,
+        on_delete=models.SET_NULL,
+        related_name="expenses",
+        null=True,
+        blank=True,
+    )
+    fk_payment_id = models.ForeignKey(
+        ExpensePayment,
+        on_delete=models.SET_NULL,
+        related_name="expenses",
+        null=True,
+        blank=True,
+    )
+
+    def __str__(self):
+        return f"{self.fk_expense_month_id.date} - {self.fk_expense_month_id.fk_user_id.username} - {self.description} - {self.value}"

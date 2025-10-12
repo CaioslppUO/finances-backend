@@ -13,7 +13,7 @@ from .views import (
 router = DefaultRouter()
 
 # Routes
-router.register(r"expenses", ExpenseMonthViewSet, basename="expenses")
+router.register(r"expenses_month", ExpenseMonthViewSet, basename="expenses_month")
 router.register(r"expenses_types", ExpenseTypeViewSet, basename="expenses_types")
 router.register(r"expenses_budgets", ExpenseBudgetViewSet, basename="expenses_budgets")
 router.register(

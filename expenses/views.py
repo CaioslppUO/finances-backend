@@ -3,6 +3,7 @@ from rest_framework import viewsets
 
 # Django Rest
 from rest_framework.response import Response
+from rest_framework.decorators import action
 
 # Models
 from expenses.models import ExpenseMonth, ExpenseType, ExpenseBudget, ExpensePayment
@@ -20,6 +21,13 @@ from .serializers import (
 class ExpenseMonthViewSet(viewsets.ModelViewSet):
     queryset = ExpenseMonth.objects.all()
     serializer_class = ExpenseMonthSerializer
+    http_method_names = ["get", "post", "put", "patch"]
+
+    @action(detail=False, url_path="user/(?P<user_id>[^/.]+)")
+    def by_user(self, request, user_id=None):
+        queryset = self.queryset.filter(fk_user_id=user_id)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
 
 class ExpenseTypeViewSet(viewsets.ModelViewSet):
