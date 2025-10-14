@@ -18,9 +18,11 @@ Including another URLconf
 # Django
 from django.contrib import admin
 from django.urls import path, include
+from django.contrib.auth.decorators import login_required
 
 # Django rest
-from rest_framework import permissions
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
 
 # Yasg
 from drf_yasg import openapi
@@ -32,20 +34,21 @@ schema_view = get_schema_view(
     openapi.Info(
         title="Expenses API",
         default_version="v1",
-        description="API to manage montly expenses.",
-        contact=openapi.Contact(email="caioslppuo@gmail.com"),
+        description="API to manage monthly expenses.",
     ),
-    public=True,
-    permission_classes=(permissions.AllowAny,),
+    public=False,
 )
 
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("expenses.urls")),
+    path("api-auth/", include("rest_framework.urls")),
     # Swagger e Redoc
     path(
-        "swagger/", schema_view.with_ui("swagger", cache_timeout=0), name="swagger-ui"
+        "swagger/",
+        login_required(schema_view.with_ui("swagger", cache_timeout=0)),
+        name="swagger-ui",
     ),
     path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="redoc-ui"),
 ]
