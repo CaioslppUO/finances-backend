@@ -17,20 +17,15 @@ Including another URLconf
 
 # Django
 from django.contrib import admin
-from django.urls import path, include, reverse
 from django.shortcuts import redirect
+from django.urls import path, include, reverse
 from django.contrib.auth.decorators import login_required
-
-# Django rest
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.permissions import IsAuthenticated
 
 # Yasg
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view
 
 # Schemas
-
 schema_view = get_schema_view(
     openapi.Info(
         title="Expenses API",

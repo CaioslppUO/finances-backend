@@ -2,7 +2,7 @@
 from rest_framework.permissions import BasePermission
 
 
-user_group_actions = ["by_user"]
+user_group_actions = ["by_user", "create_by_user"]
 
 
 class IsInGroup(BasePermission):
