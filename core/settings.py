@@ -89,6 +89,10 @@ REST_FRAMEWORK = {
     ],
 }
 
+SWAGGER_SETTINGS = {
+    "SECURITY_DEFINITIONS": {"basic": {"type": "basic"}},
+}
+
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases

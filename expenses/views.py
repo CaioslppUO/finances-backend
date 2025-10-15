@@ -18,7 +18,7 @@ from .serializers import (
 )
 
 # Permissions
-from .permissions import IsInGroup
+from .permissions import IsInGroup, user_group_actions
 
 
 # ViewSets
@@ -26,21 +26,28 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
     queryset = ExpenseMonth.objects.all()
     serializer_class = ExpenseMonthSerializer
     http_method_names = ["get", "post", "put", "patch"]
-    required_groups = ["user"]
+    required_groups = ["admin"]
     permission_classes = [IsAuthenticated, IsInGroup]
 
-    @action(detail=False, url_path="user/(?P<user_id>[^/.]+)")
-    def by_user(self, request, user_id=None):
-        queryset = self.queryset.filter(fk_user_id=user_id)
+    @action(detail=False, url_path="user")
+    def by_user(self, request):
+        print(request.user.id)
+        queryset = self.queryset.filter(fk_user_id=request.user.id)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    def get_permissions(self):
+        if self.action in user_group_actions:
+            return [IsAuthenticated()]  # User permissions
+
+        # Default controller
+        return super().get_permissions()
 
 
 class ExpenseTypeViewSet(viewsets.ModelViewSet):
     queryset = ExpenseType.objects.all()
     serializer_class = ExpenseTypeSerializer
     http_method_names = ["get", "post", "put", "patch"]
-    required_groups = ["user"]
     required_groups = ["user"]
     permission_classes = [IsAuthenticated, IsInGroup]
 
@@ -57,5 +64,5 @@ class ExpensePaymentViewSet(viewsets.ModelViewSet):
     queryset = ExpensePayment.objects.all()
     serializer_class = ExpensePaymentSerializer
     http_method_names = ["get", "post", "put", "patch"]
-    required_groups = ["user"]
+    required_groups = ["admin"]
     permission_classes = [IsAuthenticated, IsInGroup]

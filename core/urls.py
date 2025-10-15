@@ -17,7 +17,8 @@ Including another URLconf
 
 # Django
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, reverse
+from django.shortcuts import redirect
 from django.contrib.auth.decorators import login_required
 
 # Django rest
@@ -39,11 +40,18 @@ schema_view = get_schema_view(
     public=False,
 )
 
+# Views
+from .views import LogoutView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("expenses.urls")),
     path("api-auth/", include("rest_framework.urls")),
+    path("api/accounts/logout/", LogoutView.as_view(), name="logout"),
+    path(
+        "accounts/logout/",
+        lambda request: redirect(reverse("logout"), permanent=True),
+    ),
     # Swagger e Redoc
     path(
         "swagger/",
