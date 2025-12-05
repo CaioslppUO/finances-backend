@@ -4,6 +4,8 @@ from django.shortcuts import redirect
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework.permissions import IsAuthenticated
+from .serializers import CustomTokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 
 class LogoutView(APIView):
@@ -18,3 +20,7 @@ class LogoutView(APIView):
     def post(self, request, *args, **kwargs):
         logout(request)
         return redirect(reverse("swagger-ui"))
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    # Usa o Serializer customizado
+    serializer_class = CustomTokenObtainPairSerializer

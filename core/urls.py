@@ -25,6 +25,7 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 from rest_framework.permissions import AllowAny
+from rest_framework_simplejwt.views import TokenRefreshView
 
 # Yasg
 from drf_yasg import openapi
@@ -44,13 +45,14 @@ schema_view = get_schema_view(
 
 # Views
 from .views import LogoutView
+from .views import CustomTokenObtainPairView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("api/", include("expenses.urls")),
     path("api-auth/", include("rest_framework.urls")),
     path("api/accounts/logout/", LogoutView.as_view(), name="logout"),
-    path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/login/', CustomTokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path(
         "accounts/logout/",
