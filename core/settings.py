@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -84,14 +85,25 @@ REST_FRAMEWORK = {
     ],
     # Define o método de autenticação (usado para sessions, JWT, etc.)
     "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.SessionAuthentication",
-        "rest_framework.authentication.BasicAuthentication",
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        # "rest_framework.authentication.SessionAuthentication",
+        # "rest_framework.authentication.BasicAuthentication",
     ],
 }
 
 SWAGGER_SETTINGS = {
-    "SECURITY_DEFINITIONS": {"basic": {"type": "basic"}},
+    "USE_SESSION_AUTH": False,
+    "SECURITY_DEFINITIONS": {
+        "Bearer": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header",
+        }
+    },
+    "DEFAULT_API_KEY": "Bearer",
+    "REFETCH_SCHEMA_WITH_AUTH": True,
 }
+
 
 
 # Database
@@ -145,3 +157,18 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+SIMPLE_JWT = {
+    # Tempo de vida do token de acesso (o que vai durar 1 hora)
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1), 
+    
+    # Tempo de vida do token de refresh (para gerar novos tokens de acesso).
+    # Recomenda-se manter um tempo maior aqui.
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1), 
+
+    # Tipos de cabeçalho de autenticação (mantendo o padrão 'Bearer')
+    'AUTH_HEADER_TYPES': ('Bearer',),
+    
+    # Você pode manter o restante das configurações no padrão, 
+    # mas esta é a alteração principal para a expiração.
+}

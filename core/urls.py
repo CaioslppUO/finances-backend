@@ -20,6 +20,11 @@ from django.contrib import admin
 from django.shortcuts import redirect
 from django.urls import path, include, reverse
 from django.contrib.auth.decorators import login_required
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
+from rest_framework.permissions import AllowAny
 
 # Yasg
 from drf_yasg import openapi
@@ -32,7 +37,9 @@ schema_view = get_schema_view(
         default_version="v1",
         description="API to manage monthly expenses.",
     ),
-    public=False,
+    public=True,
+    authentication_classes=[],
+    permission_classes=[AllowAny],
 )
 
 # Views
@@ -43,6 +50,8 @@ urlpatterns = [
     path("api/", include("expenses.urls")),
     path("api-auth/", include("rest_framework.urls")),
     path("api/accounts/logout/", LogoutView.as_view(), name="logout"),
+    path('api/login/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path(
         "accounts/logout/",
         lambda request: redirect(reverse("logout"), permanent=True),
@@ -50,7 +59,7 @@ urlpatterns = [
     # Swagger e Redoc
     path(
         "swagger/",
-        login_required(schema_view.with_ui("swagger", cache_timeout=0)),
+        schema_view.with_ui("swagger", cache_timeout=0),
         name="swagger-ui",
     ),
     path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="redoc-ui"),

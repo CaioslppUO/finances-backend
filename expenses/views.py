@@ -5,6 +5,7 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 # Models
 from expenses.models import ExpenseMonth, ExpenseType, ExpenseBudget, ExpensePayment
@@ -20,7 +21,6 @@ from .serializers import (
 # Permissions
 from .permissions import IsInGroup, user_group_actions
 
-
 # ViewSets
 class ExpenseMonthViewSet(viewsets.ModelViewSet):
     queryset = ExpenseMonth.objects.all()
@@ -28,26 +28,43 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
     http_method_names = ["get", "post", "put", "patch"]
     required_groups = ["admin"]
     permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
 
-    def list(self, request, *args, **kwargs):
-        user = request.user
+    def get_queryset(self):
+        """
+        Retorna o queryset filtrado com base nas permissões do usuário.
+        Esta lógica se aplica automaticamente a list() e retrieve().
+        """
+        user = self.request.user
         user_groups = [group.name for group in user.groups.all()]
-
+        
+        # 1. Superuser: Vê todos os objetos
         if user.is_superuser:
-            response = super().list(request, *args, **kwargs)
-        elif "user" in user_groups:
-            queryset = self.queryset.filter(fk_user_id=user.id)
-            serializer = self.get_serializer(queryset, many=True)
-            response = Response(serializer.data)
+            return self.queryset.all()
 
-        return response
+        # 2. Usuário no grupo "user": Vê apenas seus próprios objetos
+        elif "user" in user_groups:
+            # Filtra o queryset para incluir apenas despesas do usuário logado
+            return self.queryset.filter(fk_user_id=user.id)
+            
+        # 3. Outros casos (sem permissão): Retorna um queryset vazio
+        # Isso resultará em 404 (Not Found) para retrieve e lista vazia para list
+        return self.queryset.none()
+
+    # --- list() SIMPLIFICADO ---
+    def list(self, request, *args, **kwargs):
+        return super().list(request, *args, **kwargs)
 
     def retrieve(self, request, *args, **kwargs):
         return super().retrieve(request, *args, **kwargs)
 
-    def create(self, request, *args, **kwargs):
-        response = super().create(request, *args, **kwargs)
-        return response
+    def perform_create(self, serializer):
+        # Passa o parâmetro fk_user_id de acordo com o usuário que fez a requisição.
+        serializer.save(fk_user_id=self.request.user)
+    
+    def perform_update(self, serializer):
+        # Passa o parâmetro fk_user_id de acordo com o usuário que fez a requisição.
+        serializer.save(fk_user_id=self.request.user)
 
     def update(self, request, *args, **kwargs):
         return super().update(request, *args, **kwargs)
