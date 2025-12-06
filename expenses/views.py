@@ -1,5 +1,5 @@
 # Django
-from rest_framework import viewsets
+from rest_framework import viewsets, status
 
 # Django Rest
 from rest_framework.response import Response
@@ -206,3 +206,28 @@ class ExpenseViewSet(viewsets.ModelViewSet):
     def perform_update(self, serializer):
         # Passa o parâmetro fk_user_id de acordo com o usuário que fez a requisição.
         serializer.save(fk_user_id=self.request.user)
+
+    @action(detail=False, methods=['get'])
+    def year(self, request, pk=None):
+        """
+        Retorna, por mês, no período de um ano (janeiro a dezembro), todas as despesas.
+        """
+        year = request.query_params.get("year")
+        if not year:
+            return Response({"error": "O parâmetro 'year' é obrigatório."}, status=status.HTTP_400_BAD_REQUEST)
+        
+        try:
+            int(year)
+        except ValueError:
+            return Response({"error": "O parâmetro 'year' deve ser um número inteiro."}, status=status.HTTP_400_BAD_REQUEST)
+
+        expenses = self.get_queryset().filter(date__year=year).all() 
+        
+        # Vetor com 12 posições: 0 = Janeiro, 11 = Dezembro.
+        expenses_by_month = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+        
+        for expense in expenses:
+            month = expense.date.month
+            expenses_by_month[month-1] = round(expenses_by_month[month-1] + float(expense.value), 2)
+
+        return Response(expenses_by_month)
