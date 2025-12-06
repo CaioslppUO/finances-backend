@@ -37,3 +37,6 @@ class ExpensePaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = ExpensePayment
         fields = "__all__"
+        extra_kwargs = {
+            'fk_user_id': {'read_only': True}
+        }

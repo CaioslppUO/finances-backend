@@ -51,7 +51,6 @@ class ExpenseMonthViewSet(viewsets.ModelViewSet):
         # Isso resultará em 404 (Not Found) para retrieve e lista vazia para list
         return self.queryset.none()
 
-    # --- list() SIMPLIFICADO ---
     def list(self, request, *args, **kwargs):
         return super().list(request, *args, **kwargs)
 
@@ -77,8 +76,30 @@ class ExpenseTypeViewSet(viewsets.ModelViewSet):
     queryset = ExpenseType.objects.all()
     serializer_class = ExpenseTypeSerializer
     http_method_names = ["get", "post", "put", "patch"]
-    required_groups = ["admin"]
+    required_groups = ["user"]
     permission_classes = [IsAuthenticated, IsInGroup]
+    authentication_classes = [JWTAuthentication]
+
+    def get_queryset(self):
+        """
+        Retorna o queryset filtrado com base nas permissões do usuário.
+        Esta lógica se aplica automaticamente a list() e retrieve().
+        """
+        user = self.request.user
+        user_groups = [group.name for group in user.groups.all()]
+        
+        # 1. Superuser: Vê todos os objetos
+        if user.is_superuser:
+            return self.queryset.all()
+
+        # 2. Usuário no grupo "user": Vê apenas seus próprios objetos
+        elif "user" in user_groups:
+            # Filtra o queryset para incluir apenas despesas do usuário logado
+            return self.queryset.filter(fk_user_id=user.id)
+            
+        # 3. Outros casos (sem permissão): Retorna um queryset vazio
+        # Isso resultará em 404 (Not Found) para retrieve e lista vazia para list
+        return self.queryset.none()
 
     def get_permissions(self):
         if self.action in user_group_actions:
@@ -92,14 +113,44 @@ class ExpenseTypeViewSet(viewsets.ModelViewSet):
         queryset = self.queryset.filter(fk_user_id=request.user.id)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+    
+    def perform_create(self, serializer):
+        # Passa o parâmetro fk_user_id de acordo com o usuário que fez a requisição.
+        serializer.save(fk_user_id=self.request.user)
+    
+    def perform_update(self, serializer):
+        # Passa o parâmetro fk_user_id de acordo com o usuário que fez a requisição.
+        serializer.save(fk_user_id=self.request.user)
 
 
 class ExpenseBudgetViewSet(viewsets.ModelViewSet):
     queryset = ExpenseBudget.objects.all()
     serializer_class = ExpenseBudgetSerializer
     http_method_names = ["get", "post", "put", "patch"]
-    required_groups = ["admin"]
+    required_groups = ["user"]
     permission_classes = [IsAuthenticated, IsInGroup]
+    authentication_classes = [JWTAuthentication]
+
+    def get_queryset(self):
+        """
+        Retorna o queryset filtrado com base nas permissões do usuário.
+        Esta lógica se aplica automaticamente a list() e retrieve().
+        """
+        user = self.request.user
+        user_groups = [group.name for group in user.groups.all()]
+        
+        # 1. Superuser: Vê todos os objetos
+        if user.is_superuser:
+            return self.queryset.all()
+
+        # 2. Usuário no grupo "user": Vê apenas seus próprios objetos
+        elif "user" in user_groups:
+            # Filtra o queryset para incluir apenas despesas do usuário logado
+            return self.queryset.filter(fk_user_id=user.id)
+            
+        # 3. Outros casos (sem permissão): Retorna um queryset vazio
+        # Isso resultará em 404 (Not Found) para retrieve e lista vazia para list
+        return self.queryset.none()
 
     def get_permissions(self):
         if self.action in user_group_actions:
@@ -113,14 +164,44 @@ class ExpenseBudgetViewSet(viewsets.ModelViewSet):
         queryset = self.queryset.filter(fk_user_id=request.user.id)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+    
+    def perform_create(self, serializer):
+        # Passa o parâmetro fk_user_id de acordo com o usuário que fez a requisição.
+        serializer.save(fk_user_id=self.request.user)
+    
+    def perform_update(self, serializer):
+        # Passa o parâmetro fk_user_id de acordo com o usuário que fez a requisição.
+        serializer.save(fk_user_id=self.request.user)
 
 
 class ExpensePaymentViewSet(viewsets.ModelViewSet):
     queryset = ExpensePayment.objects.all()
     serializer_class = ExpensePaymentSerializer
     http_method_names = ["get", "post", "put", "patch"]
-    required_groups = ["admin"]
+    required_groups = ["user"]
     permission_classes = [IsAuthenticated, IsInGroup]
+    authentication_classes = [JWTAuthentication]
+
+    def get_queryset(self):
+        """
+        Retorna o queryset filtrado com base nas permissões do usuário.
+        Esta lógica se aplica automaticamente a list() e retrieve().
+        """
+        user = self.request.user
+        user_groups = [group.name for group in user.groups.all()]
+        
+        # 1. Superuser: Vê todos os objetos
+        if user.is_superuser:
+            return self.queryset.all()
+
+        # 2. Usuário no grupo "user": Vê apenas seus próprios objetos
+        elif "user" in user_groups:
+            # Filtra o queryset para incluir apenas despesas do usuário logado
+            return self.queryset.filter(fk_user_id=user.id)
+            
+        # 3. Outros casos (sem permissão): Retorna um queryset vazio
+        # Isso resultará em 404 (Not Found) para retrieve e lista vazia para list
+        return self.queryset.none()
 
     def get_permissions(self):
         if self.action in user_group_actions:
@@ -134,3 +215,11 @@ class ExpensePaymentViewSet(viewsets.ModelViewSet):
         queryset = self.queryset.filter(fk_user_id=request.user.id)
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data)
+
+    def perform_create(self, serializer):
+        # Passa o parâmetro fk_user_id de acordo com o usuário que fez a requisição.
+        serializer.save(fk_user_id=self.request.user)
+    
+    def perform_update(self, serializer):
+        # Passa o parâmetro fk_user_id de acordo com o usuário que fez a requisição.
+        serializer.save(fk_user_id=self.request.user)
