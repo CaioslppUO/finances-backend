@@ -2,18 +2,10 @@
 from django.contrib import admin
 
 # Models
-from .models import ExpenseMonth, ExpenseType, ExpenseBudget, ExpensePayment, Expense
+from .models import ExpenseType, ExpenseBudget, ExpensePayment, Expense
 
 
 # Registers
-@admin.register(ExpenseMonth)
-class ExpenseMonthAdmin(admin.ModelAdmin):
-    list_display = ("expense_month_id", "date", "fk_user_id")
-    list_filter = ("expense_month_id", "date", "fk_user_id")
-    search_fields = ("expense_month_id", "date", "fk_user_id")
-    ordering = ("expense_month_id", "date")
-
-
 @admin.register(ExpenseType)
 class ExpenseTypeAdmin(admin.ModelAdmin):
     list_display = ("expense_type_id", "type", "fk_user_id", "is_active")
@@ -42,19 +34,19 @@ class ExpensePaymentAdmin(admin.ModelAdmin):
 class ExpenseAdmin(admin.ModelAdmin):
     list_display = (
         "expense_id",
-        "fk_expense_month_id__date",
-        "fk_expense_month_id__fk_user_id",
+        "fk_user_id",
+        "date",
         "description",
         "value",
     )
     list_filter = (
         "expense_id",
-        "fk_expense_month_id__date",
-        "fk_expense_month_id__fk_user_id",
+        "fk_user_id",
+        "date",
     )
     search_fields = (
         "expense_id",
-        "fk_expense_month_id__date",
-        "fk_expense_month_id__fk_user_id",
+        "fk_user_id",
+        "date",
     )
-    ordering = ("expense_id", "fk_expense_month_id__date")
+    ordering = ("expense_id", "fk_user_id", "date")
