@@ -29,7 +29,7 @@ from .permissions import IsInGroup, user_group_actions
 class ExpenseTypeViewSet(viewsets.ModelViewSet):
     queryset = ExpenseType.objects.all()
     serializer_class = ExpenseTypeSerializer
-    http_method_names = ["get", "post", "put", "patch"]
+    http_method_names = ["get", "post", "put", "patch", "delete"]
     required_groups = ["user"]
     permission_classes = [IsAuthenticated, IsInGroup]
     authentication_classes = [JWTAuthentication]
@@ -74,7 +74,7 @@ class ExpenseTypeViewSet(viewsets.ModelViewSet):
 class ExpenseBudgetViewSet(viewsets.ModelViewSet):
     queryset = ExpenseBudget.objects.all()
     serializer_class = ExpenseBudgetSerializer
-    http_method_names = ["get", "post", "put", "patch"]
+    http_method_names = ["get", "post", "put", "patch", "delete"]
     required_groups = ["user"]
     permission_classes = [IsAuthenticated, IsInGroup]
     authentication_classes = [JWTAuthentication]
@@ -119,7 +119,7 @@ class ExpenseBudgetViewSet(viewsets.ModelViewSet):
 class ExpensePaymentViewSet(viewsets.ModelViewSet):
     queryset = ExpensePayment.objects.all()
     serializer_class = ExpensePaymentSerializer
-    http_method_names = ["get", "post", "put", "patch"]
+    http_method_names = ["get", "post", "put", "patch", "delete"]
     required_groups = ["user"]
     permission_classes = [IsAuthenticated, IsInGroup]
     authentication_classes = [JWTAuthentication]
