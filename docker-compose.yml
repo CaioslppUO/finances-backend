@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+    backend:
+        container_name: django-backend
+        build: .
+        command: gunicorn finances-backend.wsgi:application --bind 0.0.0.0:8000
+        env_file:
+            - .env
+        ports:
+            - "8000:8000"
+        restart: unless-stopped
