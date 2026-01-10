@@ -1,3 +1,6 @@
+# Django e django rest
+from rest_framework import serializers
+from django.contrib.auth.models import User, Group
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
@@ -28,3 +31,24 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         }
 
         return data
+    
+class UserCreateSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True, min_length=8)
+    class Meta:
+        model = User
+        fields = ("id", "username", "email", "password")
+
+    def create(self, validated_data):
+        user = User.objects.create_user(
+            username=validated_data["username"],
+            email=validated_data.get("email"),
+            password=validated_data["password"]
+        )
+
+        # Busca ou cria o grupo "user"
+        group, created = Group.objects.get_or_create(name="user")
+
+        # Adiciona o usuário ao grupo
+        user.groups.add(group)
+
+        return user

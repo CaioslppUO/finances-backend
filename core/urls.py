@@ -45,6 +45,7 @@ schema_view = get_schema_view(
 
 # Views
 from .views import LogoutView
+from .views import UserCreateView
 from .views import CustomTokenObtainPairView
 
 urlpatterns = [
@@ -65,4 +66,5 @@ urlpatterns = [
         name="swagger-ui",
     ),
     path("redoc/", schema_view.with_ui("redoc", cache_timeout=0), name="redoc-ui"),
+    path("api/users/", UserCreateView.as_view(), name="user-create"),
 ]
