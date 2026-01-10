@@ -4,9 +4,16 @@ services:
     backend:
         container_name: django-backend
         build: .
-        command: gunicorn finances-backend.wsgi:application --bind 0.0.0.0:8000
+        command: >
+            gunicorn core.wsgi:application
+            --bind 0.0.0.0:8000
+            --log-level debug
+            --access-logfile -
+            --error-logfile -
         env_file:
             - .env
         ports:
             - "8000:8000"
         restart: unless-stopped
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
