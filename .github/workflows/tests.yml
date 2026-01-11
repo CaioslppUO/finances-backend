@@ -2,7 +2,7 @@ name: Backend Tests
 
 on:
     push:
-        branches: [main, develop]
+        branches: [main, dev]
     pull_request:
 
 jobs:
@@ -30,4 +30,4 @@ jobs:
                   echo "ALLOWED_HOSTS=*" >> .env
 
             - name: Rodar testes
-              run: pytest
+              run: pytest --cov=expenses --cov-report=term
