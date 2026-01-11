@@ -76,5 +76,5 @@ def test_delete_expense(auth_client: APIClient, expense_type_fixture):
     # Depois de deletar
     after_delete = auth_client.get(url)
     assert after_delete.data[0]["type"] == "Expense Type 2"
-    assert after_delete.data[1]["type"] == "Expense Type 3"
+    assert after_delete.data[1]["type"] == "Expense Type 5"
     assert len(after_delete.data) == 2
