@@ -2,3 +2,4 @@
 *db*
 expenses/__pycache__
 core/__pycache__
+.pytest_cache
