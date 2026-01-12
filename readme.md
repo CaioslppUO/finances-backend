@@ -19,7 +19,7 @@ A aplicação foi desenvolvida utilizando **Python**, **Django** e **Django REST
 ## Sumário
 
 -   [Tecnologias Utilizadas](#tecnologias-utilizadas)
--   [Instalação](#-instalação-ubuntu)
+-   [Instalação](#instalação-ubuntu)
     -   [Dependências](#dependências)
     -   [Configuração do Ambiente](#configuração-do-ambiente)
     -   [Docker e Docker Compose](#docker-e-docker-compose)
