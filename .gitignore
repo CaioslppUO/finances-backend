@@ -1,5 +1,6 @@
 *env*
 *db*
 expenses/__pycache__
+expenses/tests/__pycache__
 core/__pycache__
 .pytest_cache

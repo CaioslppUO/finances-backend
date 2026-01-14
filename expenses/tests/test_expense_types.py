@@ -1,12 +1,16 @@
 # Django
 from django.urls import reverse
+from django.db import IntegrityError
 from rest_framework.test import APIClient
 
 # Pytest
 import pytest
 
+# Models
+from expenses.models import ExpenseType
+
 @pytest.mark.django_db
-def test_create_expense(auth_client: APIClient):
+def test_create_expense_type(auth_client: APIClient) -> None:
     # Rota
     url = reverse("expenses_types-list")
 
@@ -23,7 +27,7 @@ def test_create_expense(auth_client: APIClient):
     assert response.data["is_active"] == True
 
 @pytest.mark.django_db
-def test_get_expense(auth_client: APIClient, expense_type_fixture):
+def test_get_expense_type(auth_client: APIClient, expense_type_fixture) -> None:
     # Rota
     url = reverse("expenses_types-list")
     response = auth_client.get(url)
@@ -38,7 +42,7 @@ def test_get_expense(auth_client: APIClient, expense_type_fixture):
     assert response.data[2]["type"] == "Expense Type 3"
 
 @pytest.mark.django_db
-def test_update_expense(auth_client: APIClient, expense_type_fixture):
+def test_update_expense_type(auth_client: APIClient, expense_type_fixture) -> None:
     # Rota
     url = reverse("expenses_types-list")
 
@@ -61,7 +65,7 @@ def test_update_expense(auth_client: APIClient, expense_type_fixture):
     assert after_edit.data[2]["type"] == "Expense Type 3"
 
 @pytest.mark.django_db
-def test_delete_expense(auth_client: APIClient, expense_type_fixture):
+def test_delete_expense_type(auth_client: APIClient, expense_type_fixture) -> None:
     # Rota
     url = reverse("expenses_types-list")
 
@@ -78,3 +82,28 @@ def test_delete_expense(auth_client: APIClient, expense_type_fixture):
     assert after_delete.data[0]["type"] == "Expense Type 2"
     assert after_delete.data[1]["type"] == "Expense Type 3"
     assert len(after_delete.data) == 2
+
+@pytest.mark.django_db(transaction=True)
+def test_block_duplicated_type_creation(auth_client: APIClient) -> None:
+    # Rota
+    url = reverse("expenses_types-list")
+
+    # Cria um tipo para testar depois
+    payload = {
+        "type": "Repeated Expense Type"
+    }
+    response = auth_client.post(url, payload, format="json")
+
+    assert response.status_code == 201
+    assert response.data["type"] == "Repeated Expense Type"
+    assert response.data["is_active"] == True
+
+    payload = {
+        "type": "Repeated Expense Type"
+    }
+
+    with pytest.raises(IntegrityError):
+        response2 = auth_client.post(url, payload, format="json")
+    
+    # Teste
+    assert ExpenseType.objects.count() == 1
