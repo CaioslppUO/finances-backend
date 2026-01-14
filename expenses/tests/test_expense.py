@@ -1,13 +1,9 @@
 # Django
 from django.urls import reverse
-from django.db import IntegrityError
 from rest_framework.test import APIClient
 
 # Pytest
 import pytest
-
-# Models
-from expenses.models import ExpensePayment
 
 @pytest.mark.django_db
 def test_create_expense(auth_client: APIClient, expense_payment_fixture, expense_budget_fixture, expense_type_fixture):
